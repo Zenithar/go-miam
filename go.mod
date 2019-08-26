@@ -19,6 +19,7 @@ require (
 	github.com/spf13/cobra v0.0.4
 	github.com/spf13/pflag v1.0.3
 	github.com/uber/prototool v1.8.1 // indirect
+	go.zenithar.org/pkg/db v0.0.3
 	go.zenithar.org/pkg/errors v0.0.1
 	go.zenithar.org/pkg/reactor v0.0.4
 	go.zenithar.org/protoc-gen-cobra v0.0.3 // indirect

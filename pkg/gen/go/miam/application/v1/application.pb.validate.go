@@ -46,6 +46,10 @@ func (m *Application) Validate() error {
 
 	// no validation rules for Id
 
+	// no validation rules for Label
+
+	// no validation rules for Urn
+
 	return nil
 }
 

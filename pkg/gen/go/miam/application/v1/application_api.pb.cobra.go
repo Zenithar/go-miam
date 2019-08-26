@@ -250,3 +250,107 @@ func init() {
 	ApplicationAPIClientCommand.AddCommand(applicationAPI_CreateClientCommand)
 	DefaultClientCommandConfig.AddFlags(applicationAPI_CreateClientCommand.Flags())
 }
+
+var applicationAPI_UpdateClientCommand = &cobra.Command{
+	Use:  "update",
+	Long: "Update client\n\nYou can use environment variables with the same name of the command flags.\nAll caps and s/-/_, e.g. SERVER_ADDR.",
+	Example: `
+Save a sample request to a file (or refer to your protobuf descriptor to create one):
+	update -p > req.json
+Submit request using file:
+	update -f req.json
+Authenticate using the Authorization header (requires transport security):
+	export AUTH_TOKEN=your_access_token
+	export SERVER_ADDR=api.example.com:443
+	echo '{json}' | update --tls`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		var req UpdateRequest
+
+		// Get a connection
+		conn, err := dial(DefaultClientCommandConfig)
+		if err != nil {
+			return err
+		}
+		defer conn.Close()
+
+		// Initialize client wrapper
+		grpcClient := NewApplicationAPIClient(conn)
+
+		// Unmarshal request
+		if err := jsonpb.Unmarshal(bufio.NewReader(os.Stdin), &req); err != nil {
+			return err
+		}
+
+		// Prepare context
+		ctx := context.Background()
+
+		// Do the call
+		res, err := grpcClient.Update(ctx, &req)
+		if err != nil {
+			return err
+		}
+
+		// Beautify result
+		beautify(res)
+
+		// no error
+		return nil
+	},
+}
+
+func init() {
+	ApplicationAPIClientCommand.AddCommand(applicationAPI_UpdateClientCommand)
+	DefaultClientCommandConfig.AddFlags(applicationAPI_UpdateClientCommand.Flags())
+}
+
+var applicationAPI_DeleteClientCommand = &cobra.Command{
+	Use:  "delete",
+	Long: "Delete client\n\nYou can use environment variables with the same name of the command flags.\nAll caps and s/-/_, e.g. SERVER_ADDR.",
+	Example: `
+Save a sample request to a file (or refer to your protobuf descriptor to create one):
+	delete -p > req.json
+Submit request using file:
+	delete -f req.json
+Authenticate using the Authorization header (requires transport security):
+	export AUTH_TOKEN=your_access_token
+	export SERVER_ADDR=api.example.com:443
+	echo '{json}' | delete --tls`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		var req DeleteRequest
+
+		// Get a connection
+		conn, err := dial(DefaultClientCommandConfig)
+		if err != nil {
+			return err
+		}
+		defer conn.Close()
+
+		// Initialize client wrapper
+		grpcClient := NewApplicationAPIClient(conn)
+
+		// Unmarshal request
+		if err := jsonpb.Unmarshal(bufio.NewReader(os.Stdin), &req); err != nil {
+			return err
+		}
+
+		// Prepare context
+		ctx := context.Background()
+
+		// Do the call
+		res, err := grpcClient.Delete(ctx, &req)
+		if err != nil {
+			return err
+		}
+
+		// Beautify result
+		beautify(res)
+
+		// no error
+		return nil
+	},
+}
+
+func init() {
+	ApplicationAPIClientCommand.AddCommand(applicationAPI_DeleteClientCommand)
+	DefaultClientCommandConfig.AddFlags(applicationAPI_DeleteClientCommand.Flags())
+}

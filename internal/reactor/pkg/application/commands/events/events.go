@@ -45,7 +45,7 @@ func ApplicationCreated(ctx context.Context, id, label string) *eventsv1.Event {
 }
 
 // ApplicationActivated is raised when an application domain has been activated.
-func ApplicationActivated(ctx context.Context, id string) interface{} {
+func ApplicationActivated(ctx context.Context, id string) *eventsv1.Event {
 	// Build event
 	return &eventsv1.Event{
 		EventType:     eventsv1.EventType_EVENT_TYPE_APPLICATION_ACTIVATED,
@@ -62,7 +62,7 @@ func ApplicationActivated(ctx context.Context, id string) interface{} {
 }
 
 // ApplicationDeactivated is raised when an application domain has been deactivated.
-func ApplicationDeactivated(ctx context.Context, id string) interface{} {
+func ApplicationDeactivated(ctx context.Context, id string) *eventsv1.Event {
 	// Build event
 	return &eventsv1.Event{
 		EventType:     eventsv1.EventType_EVENT_TYPE_APPLICATION_DEACTIVATED,
@@ -79,7 +79,7 @@ func ApplicationDeactivated(ctx context.Context, id string) interface{} {
 }
 
 // ApplicationDeleted is raised when an application entity has been deleted.
-func ApplicationDeleted(ctx context.Context, id string) interface{} {
+func ApplicationDeleted(ctx context.Context, id string) *eventsv1.Event {
 	// Build event
 	return &eventsv1.Event{
 		EventType:     eventsv1.EventType_EVENT_TYPE_APPLICATION_DELETED,
@@ -96,7 +96,7 @@ func ApplicationDeleted(ctx context.Context, id string) interface{} {
 }
 
 // ApplicationLabelChanged is raised when an application label attribute value has changed.
-func ApplicationLabelChanged(ctx context.Context, id, old, new string) interface{} {
+func ApplicationLabelChanged(ctx context.Context, id, old, new string) *eventsv1.Event {
 	// Build event
 	return &eventsv1.Event{
 		EventType:     eventsv1.EventType_EVENT_TYPE_APPLICATION_LABEL_UPDATED,

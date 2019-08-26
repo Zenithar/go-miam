@@ -23,4 +23,16 @@ import (
 // ApplicationCreator describes application creator contract.
 type ApplicationCreator interface {
 	Create(ctx context.Context, entity *models.Application) error
+	Delete(ctx context.Context, id string) error
+}
+
+// ApplicationUpdater describes application updator contract.
+type ApplicationUpdater interface {
+	Update(ctx context.Context, entity *models.Application) error
+}
+
+// ApplicationReader describes application reader contract.
+type ApplicationReader interface {
+	Get(ctx context.Context, id string) (*models.Application, error)
+	FindByLabel(ctx context.Context, label string) (*models.Application, error)
 }

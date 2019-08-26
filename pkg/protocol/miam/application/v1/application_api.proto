@@ -24,14 +24,39 @@ option java_package = "org.zenithar.miam.application.v1";
 option objc_class_prefix = "MAX";
 option php_namespace = "Miam\\Application\\V1";
 
+import "google/protobuf/wrappers.proto";
+import "miam/application/v1/application.proto";
+
 // ApplicationAPI declares application management services.
 service ApplicationAPI {
   // Create an application.
   rpc Create(CreateRequest) returns (CreateResponse);
+  // Update application attributes.
+  rpc Update(UpdateRequest) returns (UpdateResponse);
+  // Delete an application.
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
 }
 
 message CreateRequest {
   string label = 1;
 }
 
-message CreateResponse {}
+message CreateResponse {
+  Application application = 1;
+}
+
+message UpdateRequest {
+  string id = 1;
+  google.protobuf.StringValue label = 2;
+  google.protobuf.BoolValue active = 3;
+}
+
+message UpdateResponse {
+  Application application = 1;
+}
+
+message DeleteRequest {
+  string id = 1;
+}
+
+message DeleteResponse {}

@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// 	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-syntax = "proto3";
+package mapper
 
-package miam.application.v1;
+import (
+	"go.zenithar.org/miam/internal/models"
+	applicationv1 "go.zenithar.org/miam/pkg/gen/go/miam/application/v1"
+)
 
-option csharp_namespace = "Miam.Application.V1";
-option go_package = "applicationv1";
-option java_multiple_files = true;
-option java_outer_classname = "ApplicationProto";
-option java_package = "org.zenithar.miam.application.v1";
-option objc_class_prefix = "MAX";
-option php_namespace = "Miam\\Application\\V1";
-
-// Application is a resource provider.
-message Application {
-  string id = 1;
-  string label = 2;
-  string urn = 3;
+// FromEntity return a value object from entity.
+func FromEntity(entity *models.Application) *applicationv1.Application {
+	return &applicationv1.Application{
+		Id:    entity.ID,
+		Urn:   entity.URN(),
+		Label: entity.Label,
+	}
 }

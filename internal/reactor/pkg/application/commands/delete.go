@@ -17,26 +17,25 @@ package commands
 import (
 	"context"
 
-	"go.zenithar.org/miam/internal/models"
 	"go.zenithar.org/miam/internal/reactor/internal/broker"
 	"go.zenithar.org/miam/internal/reactor/pkg/application/commands/events"
-	"go.zenithar.org/miam/internal/reactor/pkg/application/mapper"
 	"go.zenithar.org/miam/internal/repositories"
 	applicationv1 "go.zenithar.org/miam/pkg/gen/go/miam/application/v1"
 
+	"go.zenithar.org/pkg/db"
 	"go.zenithar.org/pkg/errors"
 	"go.zenithar.org/pkg/reactor"
 )
 
-// CreateHandler returns a Create command event handler.
-var CreateHandler = func(creator repositories.ApplicationCreator, publisher broker.Publisher) reactor.HandlerFunc {
+// DeleteHandler returns a Delete command event handler.
+var DeleteHandler = func(reader repositories.ApplicationReader, creator repositories.ApplicationCreator, publisher broker.Publisher) reactor.HandlerFunc {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
-		res := &applicationv1.CreateResponse{}
+		res := &applicationv1.DeleteResponse{}
 
 		// Check request type
-		req, ok := r.(*applicationv1.CreateRequest)
+		req, ok := r.(*applicationv1.DeleteRequest)
 		if !ok {
-			return res, errors.Newf(errors.InvalidArgument, nil, "invalid request type for handler 'application.create' (%T)", r)
+			return res, errors.Newf(errors.InvalidArgument, nil, "invalid request type for handler 'application.delete' (%T)", r)
 		}
 
 		// Validate request
@@ -44,19 +43,22 @@ var CreateHandler = func(creator repositories.ApplicationCreator, publisher brok
 			return res, errors.Newf(errors.FailedPrecondition, err, "request is not valid")
 		}
 
-		// Prepare model
-		entity := models.NewApplication(req.Label)
+		// Check entity existence
+		entity, err := reader.Get(ctx, req.Id)
+		if err != nil && err != db.ErrNoResult {
+			return res, errors.Newf(errors.Internal, err, "unable to query persistence")
+		}
+		if entity == nil {
+			return res, errors.Newf(errors.NotFound, nil, "entity not found")
+		}
 
-		// Create in persistence
-		if err := creator.Create(ctx, entity); err != nil {
+		// Delete in persistence
+		if err := creator.Delete(ctx, entity.ID); err != nil {
 			return res, errors.Newf(errors.Internal, err, "unable to save entity")
 		}
 
 		// Publish event
-		publisher.Publish(ctx, events.ApplicationCreated(ctx, entity.URN(), entity.Label))
-
-		// Prepare result and return
-		res.Application = mapper.FromEntity(entity)
+		publisher.Publish(ctx, events.ApplicationDeleted(ctx, entity.URN()))
 
 		return res, nil
 	}
