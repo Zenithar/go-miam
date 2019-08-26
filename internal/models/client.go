@@ -19,14 +19,22 @@ import (
 	"time"
 
 	"go.zenithar.org/miam/internal/helpers"
+	"go.zenithar.org/pkg/types"
 )
 
 // Client describes a resource consumer in term of OIDC.
 type Client struct {
-	ID       string    `json:"id"`
-	Label    string    `json:"label"`
-	Active   bool      `json:"active"`
-	CreateAt time.Time `json:"created_at"`
+	ID            string            `json:"id"`
+	Label         string            `json:"label"`
+	Secret        string            `json:"secret"`
+	RedirectURIs  types.StringArray `json:"redirect_uris"`
+	GrantTypes    types.StringArray `json:"grant_types"`
+	ResponseTypes types.StringArray `json:"response_types"`
+	Scopes        types.StringArray `json:"scopes"`
+	Audience      types.StringArray `json:"audience"`
+	Public        bool              `json:"public"`
+	CreateAt      time.Time         `json:"created_at"`
+	Active        bool              `json:"active"`
 }
 
 // NewClient returns an client instance.
@@ -41,7 +49,18 @@ func NewClient(label string) *Client {
 
 // -----------------------------------------------------------------------------
 
+// SetSecret updates the secret attribute value.
+func (c *Client) SetSecret(secret string) error {
+	encoded, err := helpers.PasswordEncodingFunc(secret)
+	if err != nil {
+		return err
+	}
+
+	c.Secret = encoded
+	return nil
+}
+
 // URN returns the entity URN
-func (app *Client) URN() string {
-	return fmt.Sprintf("miam:v1::client:%s", app.ID)
+func (c *Client) URN() string {
+	return fmt.Sprintf("miam:v1::client:%s", c.ID)
 }
