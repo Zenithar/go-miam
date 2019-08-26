@@ -59,20 +59,22 @@ var UpdateHandler = func(reader repositories.ApplicationReader, updater reposito
 
 		// Check request attributes
 		if req.Label != nil {
-			saved, err := reader.FindByLabel(ctx, req.Label.Value)
-			if err != nil && err != db.ErrNoResult {
-				return res, errors.Newf(errors.Internal, err, "unable to query persistence")
+			if entity.Label != req.Label.Value {
+				// Check if label is not used
+				saved, err := reader.FindByLabel(ctx, req.Label.Value)
+				if err != nil && err != db.ErrNoResult {
+					return res, errors.Newf(errors.Internal, err, "unable to query persistence")
+				}
+				if saved != nil {
+					return res, errors.Newf(errors.AlreadyExists, nil, "entity label '%s' already used", req.Label.Value)
+				}
+
+				// Add event to publication list
+				eventList = append(eventList, events.ApplicationLabelChanged(ctx, entity.URN(), entity.Label, req.Label.Value))
+
+				// Assign entity attribute value
+				entity.Label = req.Label.Value
 			}
-			if saved != nil {
-				return res, errors.Newf(errors.AlreadyExists, nil, "entity label '%s' already used", req.Label.Value)
-			}
-
-			// Add event to publication list
-			eventList = append(eventList, events.ApplicationLabelChanged(ctx, entity.URN(), entity.Label, req.Label.Value))
-
-			// Assign entity attribute value
-			entity.Label = req.Label.Value
-
 		}
 
 		if req.Active != nil {

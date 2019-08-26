@@ -24,12 +24,13 @@ import (
 	"go.zenithar.org/miam/internal/repositories"
 	applicationv1 "go.zenithar.org/miam/pkg/gen/go/miam/application/v1"
 
+	"go.zenithar.org/pkg/db"
 	"go.zenithar.org/pkg/errors"
 	"go.zenithar.org/pkg/reactor"
 )
 
 // CreateHandler returns a Create command event handler.
-var CreateHandler = func(creator repositories.ApplicationCreator, publisher broker.Publisher) reactor.HandlerFunc {
+var CreateHandler = func(tx repositories.Transactional, creator repositories.ApplicationCreator, reader repositories.ApplicationReader, publisher broker.Publisher) reactor.HandlerFunc {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
 		res := &applicationv1.CreateResponse{}
 
@@ -42,6 +43,15 @@ var CreateHandler = func(creator repositories.ApplicationCreator, publisher brok
 		// Validate request
 		if err := req.Validate(); err != nil {
 			return res, errors.Newf(errors.FailedPrecondition, err, "request is not valid")
+		}
+
+		// Check if label is not used
+		saved, err := reader.FindByLabel(ctx, req.Label)
+		if err != nil && err != db.ErrNoResult {
+			return res, errors.Newf(errors.Internal, err, "unable to query persistence")
+		}
+		if saved != nil {
+			return res, errors.Newf(errors.AlreadyExists, nil, "entity label '%s' already used", req.Label)
 		}
 
 		// Prepare model
