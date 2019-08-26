@@ -24,8 +24,6 @@ option java_package = "org.zenithar.miam.events.v1";
 option objc_class_prefix = "MEX";
 option php_namespace = "Miam\\Events\\V1";
 
-import "google/protobuf/any.proto";
-
 // EventType enumerates all event type values.
 enum EventType {
   // Default value when no enumeration is specified.
@@ -45,14 +43,45 @@ message Event {
   string event_id = 2;
   string aggregate_type = 3;
   string aggregate_id = 4;
-  google.protobuf.Any meta = 5;
+  Meta meta = 5;
   oneof payload {
     ApplicationCreated application_created = 10;
+    ApplicationActivated application_activated = 11;
+    ApplicationDeactivated application_deactivated = 12;
+    ApplicationLabelChanged application_label_changed = 13;
+    ApplicationDeleted application_deleted = 14;
   }
+}
+
+// Meta decribes event metadata.
+message Meta {
+  string user_id = 1;
 }
 
 // ApplicationCreated is raised on application entity creation.
 message ApplicationCreated {
-  string urn = 1;
+  string id = 1;
   string label = 2;
+}
+
+// ApplicationActivated is raised on application entity activation.
+message ApplicationActivated {
+  string id = 1;
+}
+
+// ApplicationDeactivated is raised on application entity deactivation.
+message ApplicationDeactivated {
+  string id = 1;
+}
+
+// ApplicationLabelChanged is raised on application entity label attribute is changed.
+message ApplicationLabelChanged {
+  string id = 1;
+  string old = 2;
+  string new = 3;
+}
+
+// ApplicationDeleted is raised on application entity deletion.
+message ApplicationDeleted {
+  string id = 1;
 }

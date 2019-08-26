@@ -66,6 +66,7 @@ func (m *Event) Validate() error {
 	}
 
 	switch m.Payload.(type) {
+
 	case *Event_ApplicationCreated:
 
 		{
@@ -81,6 +82,71 @@ func (m *Event) Validate() error {
 				}
 			}
 		}
+
+	case *Event_ApplicationActivated:
+
+		{
+			tmp := m.GetApplicationActivated()
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return EventValidationError{
+						field:  "ApplicationActivated",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+		}
+
+	case *Event_ApplicationDeactivated:
+
+		{
+			tmp := m.GetApplicationDeactivated()
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return EventValidationError{
+						field:  "ApplicationDeactivated",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+		}
+
+	case *Event_ApplicationLabelChanged:
+
+		{
+			tmp := m.GetApplicationLabelChanged()
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return EventValidationError{
+						field:  "ApplicationLabelChanged",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+		}
+
+	case *Event_ApplicationDeleted:
+
+		{
+			tmp := m.GetApplicationDeleted()
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return EventValidationError{
+						field:  "ApplicationDeleted",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+		}
+
 	}
 
 	return nil
@@ -140,6 +206,72 @@ var _ interface {
 	ErrorName() string
 } = EventValidationError{}
 
+// Validate checks the field values on Meta with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *Meta) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for UserId
+
+	return nil
+}
+
+// MetaValidationError is the validation error returned by Meta.Validate if the
+// designated constraints aren't met.
+type MetaValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MetaValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MetaValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MetaValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MetaValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MetaValidationError) ErrorName() string { return "MetaValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MetaValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMeta.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MetaValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MetaValidationError{}
+
 // Validate checks the field values on ApplicationCreated with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -148,7 +280,7 @@ func (m *ApplicationCreated) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Urn
+	// no validation rules for Id
 
 	// no validation rules for Label
 
@@ -210,3 +342,283 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationCreatedValidationError{}
+
+// Validate checks the field values on ApplicationActivated with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ApplicationActivated) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	return nil
+}
+
+// ApplicationActivatedValidationError is the validation error returned by
+// ApplicationActivated.Validate if the designated constraints aren't met.
+type ApplicationActivatedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationActivatedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationActivatedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationActivatedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationActivatedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationActivatedValidationError) ErrorName() string {
+	return "ApplicationActivatedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationActivatedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationActivated.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationActivatedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationActivatedValidationError{}
+
+// Validate checks the field values on ApplicationDeactivated with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ApplicationDeactivated) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	return nil
+}
+
+// ApplicationDeactivatedValidationError is the validation error returned by
+// ApplicationDeactivated.Validate if the designated constraints aren't met.
+type ApplicationDeactivatedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationDeactivatedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationDeactivatedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationDeactivatedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationDeactivatedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationDeactivatedValidationError) ErrorName() string {
+	return "ApplicationDeactivatedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationDeactivatedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationDeactivated.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationDeactivatedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationDeactivatedValidationError{}
+
+// Validate checks the field values on ApplicationLabelChanged with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ApplicationLabelChanged) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	// no validation rules for Old
+
+	// no validation rules for New
+
+	return nil
+}
+
+// ApplicationLabelChangedValidationError is the validation error returned by
+// ApplicationLabelChanged.Validate if the designated constraints aren't met.
+type ApplicationLabelChangedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationLabelChangedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationLabelChangedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationLabelChangedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationLabelChangedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationLabelChangedValidationError) ErrorName() string {
+	return "ApplicationLabelChangedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationLabelChangedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationLabelChanged.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationLabelChangedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationLabelChangedValidationError{}
+
+// Validate checks the field values on ApplicationDeleted with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ApplicationDeleted) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Id
+
+	return nil
+}
+
+// ApplicationDeletedValidationError is the validation error returned by
+// ApplicationDeleted.Validate if the designated constraints aren't met.
+type ApplicationDeletedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationDeletedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationDeletedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationDeletedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationDeletedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationDeletedValidationError) ErrorName() string {
+	return "ApplicationDeletedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationDeletedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationDeleted.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationDeletedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationDeletedValidationError{}

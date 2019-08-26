@@ -9,7 +9,6 @@ import (
 	math "math"
 
 	proto "github.com/gogo/protobuf/proto"
-	types "github.com/gogo/protobuf/types"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -68,13 +67,17 @@ func (EventType) EnumDescriptor() ([]byte, []int) {
 
 // Event wrapper for broker.
 type Event struct {
-	EventType     EventType  `protobuf:"varint,1,opt,name=event_type,json=eventType,proto3,enum=miam.events.v1.EventType" json:"event_type,omitempty"`
-	EventId       string     `protobuf:"bytes,2,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`
-	AggregateType string     `protobuf:"bytes,3,opt,name=aggregate_type,json=aggregateType,proto3" json:"aggregate_type,omitempty"`
-	AggregateId   string     `protobuf:"bytes,4,opt,name=aggregate_id,json=aggregateId,proto3" json:"aggregate_id,omitempty"`
-	Meta          *types.Any `protobuf:"bytes,5,opt,name=meta,proto3" json:"meta,omitempty"`
+	EventType     EventType `protobuf:"varint,1,opt,name=event_type,json=eventType,proto3,enum=miam.events.v1.EventType" json:"event_type,omitempty"`
+	EventId       string    `protobuf:"bytes,2,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`
+	AggregateType string    `protobuf:"bytes,3,opt,name=aggregate_type,json=aggregateType,proto3" json:"aggregate_type,omitempty"`
+	AggregateId   string    `protobuf:"bytes,4,opt,name=aggregate_id,json=aggregateId,proto3" json:"aggregate_id,omitempty"`
+	Meta          *Meta     `protobuf:"bytes,5,opt,name=meta,proto3" json:"meta,omitempty"`
 	// Types that are valid to be assigned to Payload:
 	//	*Event_ApplicationCreated
+	//	*Event_ApplicationActivated
+	//	*Event_ApplicationDeactivated
+	//	*Event_ApplicationLabelChanged
+	//	*Event_ApplicationDeleted
 	Payload              isEvent_Payload `protobuf_oneof:"payload"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
@@ -129,7 +132,27 @@ type Event_ApplicationCreated struct {
 	ApplicationCreated *ApplicationCreated `protobuf:"bytes,10,opt,name=application_created,json=applicationCreated,proto3,oneof"`
 }
 
-func (*Event_ApplicationCreated) isEvent_Payload() {}
+type Event_ApplicationActivated struct {
+	ApplicationActivated *ApplicationActivated `protobuf:"bytes,11,opt,name=application_activated,json=applicationActivated,proto3,oneof"`
+}
+
+type Event_ApplicationDeactivated struct {
+	ApplicationDeactivated *ApplicationDeactivated `protobuf:"bytes,12,opt,name=application_deactivated,json=applicationDeactivated,proto3,oneof"`
+}
+
+type Event_ApplicationLabelChanged struct {
+	ApplicationLabelChanged *ApplicationLabelChanged `protobuf:"bytes,13,opt,name=application_label_changed,json=applicationLabelChanged,proto3,oneof"`
+}
+
+type Event_ApplicationDeleted struct {
+	ApplicationDeleted *ApplicationDeleted `protobuf:"bytes,14,opt,name=application_deleted,json=applicationDeleted,proto3,oneof"`
+}
+
+func (*Event_ApplicationCreated) isEvent_Payload()      {}
+func (*Event_ApplicationActivated) isEvent_Payload()    {}
+func (*Event_ApplicationDeactivated) isEvent_Payload()  {}
+func (*Event_ApplicationLabelChanged) isEvent_Payload() {}
+func (*Event_ApplicationDeleted) isEvent_Payload()      {}
 
 func (m *Event) GetPayload() isEvent_Payload {
 	if m != nil {
@@ -166,7 +189,7 @@ func (m *Event) GetAggregateId() string {
 	return ""
 }
 
-func (m *Event) GetMeta() *types.Any {
+func (m *Event) GetMeta() *Meta {
 	if m != nil {
 		return m.Meta
 	}
@@ -180,10 +203,42 @@ func (m *Event) GetApplicationCreated() *ApplicationCreated {
 	return nil
 }
 
+func (m *Event) GetApplicationActivated() *ApplicationActivated {
+	if x, ok := m.GetPayload().(*Event_ApplicationActivated); ok {
+		return x.ApplicationActivated
+	}
+	return nil
+}
+
+func (m *Event) GetApplicationDeactivated() *ApplicationDeactivated {
+	if x, ok := m.GetPayload().(*Event_ApplicationDeactivated); ok {
+		return x.ApplicationDeactivated
+	}
+	return nil
+}
+
+func (m *Event) GetApplicationLabelChanged() *ApplicationLabelChanged {
+	if x, ok := m.GetPayload().(*Event_ApplicationLabelChanged); ok {
+		return x.ApplicationLabelChanged
+	}
+	return nil
+}
+
+func (m *Event) GetApplicationDeleted() *ApplicationDeleted {
+	if x, ok := m.GetPayload().(*Event_ApplicationDeleted); ok {
+		return x.ApplicationDeleted
+	}
+	return nil
+}
+
 // XXX_OneofFuncs is for the internal use of the proto package.
 func (*Event) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
 	return _Event_OneofMarshaler, _Event_OneofUnmarshaler, _Event_OneofSizer, []interface{}{
 		(*Event_ApplicationCreated)(nil),
+		(*Event_ApplicationActivated)(nil),
+		(*Event_ApplicationDeactivated)(nil),
+		(*Event_ApplicationLabelChanged)(nil),
+		(*Event_ApplicationDeleted)(nil),
 	}
 }
 
@@ -194,6 +249,26 @@ func _Event_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	case *Event_ApplicationCreated:
 		_ = b.EncodeVarint(10<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.ApplicationCreated); err != nil {
+			return err
+		}
+	case *Event_ApplicationActivated:
+		_ = b.EncodeVarint(11<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.ApplicationActivated); err != nil {
+			return err
+		}
+	case *Event_ApplicationDeactivated:
+		_ = b.EncodeVarint(12<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.ApplicationDeactivated); err != nil {
+			return err
+		}
+	case *Event_ApplicationLabelChanged:
+		_ = b.EncodeVarint(13<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.ApplicationLabelChanged); err != nil {
+			return err
+		}
+	case *Event_ApplicationDeleted:
+		_ = b.EncodeVarint(14<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.ApplicationDeleted); err != nil {
 			return err
 		}
 	case nil:
@@ -214,6 +289,38 @@ func _Event_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) 
 		err := b.DecodeMessage(msg)
 		m.Payload = &Event_ApplicationCreated{msg}
 		return true, err
+	case 11: // payload.application_activated
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(ApplicationActivated)
+		err := b.DecodeMessage(msg)
+		m.Payload = &Event_ApplicationActivated{msg}
+		return true, err
+	case 12: // payload.application_deactivated
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(ApplicationDeactivated)
+		err := b.DecodeMessage(msg)
+		m.Payload = &Event_ApplicationDeactivated{msg}
+		return true, err
+	case 13: // payload.application_label_changed
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(ApplicationLabelChanged)
+		err := b.DecodeMessage(msg)
+		m.Payload = &Event_ApplicationLabelChanged{msg}
+		return true, err
+	case 14: // payload.application_deleted
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(ApplicationDeleted)
+		err := b.DecodeMessage(msg)
+		m.Payload = &Event_ApplicationDeleted{msg}
+		return true, err
 	default:
 		return false, nil
 	}
@@ -228,6 +335,26 @@ func _Event_OneofSizer(msg proto.Message) (n int) {
 		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(s))
 		n += s
+	case *Event_ApplicationActivated:
+		s := proto.Size(x.ApplicationActivated)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *Event_ApplicationDeactivated:
+		s := proto.Size(x.ApplicationDeactivated)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *Event_ApplicationLabelChanged:
+		s := proto.Size(x.ApplicationLabelChanged)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *Event_ApplicationDeleted:
+		s := proto.Size(x.ApplicationDeleted)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
@@ -235,9 +362,62 @@ func _Event_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
+// Meta decribes event metadata.
+type Meta struct {
+	UserId               string   `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Meta) Reset()         { *m = Meta{} }
+func (m *Meta) String() string { return proto.CompactTextString(m) }
+func (*Meta) ProtoMessage()    {}
+func (*Meta) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dbaf9ff3d9926480, []int{1}
+}
+
+func (m *Meta) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+
+func (m *Meta) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Meta.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+
+func (m *Meta) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Meta.Merge(m, src)
+}
+
+func (m *Meta) XXX_Size() int {
+	return m.Size()
+}
+
+func (m *Meta) XXX_DiscardUnknown() {
+	xxx_messageInfo_Meta.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Meta proto.InternalMessageInfo
+
+func (m *Meta) GetUserId() string {
+	if m != nil {
+		return m.UserId
+	}
+	return ""
+}
+
 // ApplicationCreated is raised on application entity creation.
 type ApplicationCreated struct {
-	Urn                  string   `protobuf:"bytes,1,opt,name=urn,proto3" json:"urn,omitempty"`
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Label                string   `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -248,7 +428,7 @@ func (m *ApplicationCreated) Reset()         { *m = ApplicationCreated{} }
 func (m *ApplicationCreated) String() string { return proto.CompactTextString(m) }
 func (*ApplicationCreated) ProtoMessage()    {}
 func (*ApplicationCreated) Descriptor() ([]byte, []int) {
-	return fileDescriptor_dbaf9ff3d9926480, []int{1}
+	return fileDescriptor_dbaf9ff3d9926480, []int{2}
 }
 
 func (m *ApplicationCreated) XXX_Unmarshal(b []byte) error {
@@ -282,9 +462,9 @@ func (m *ApplicationCreated) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ApplicationCreated proto.InternalMessageInfo
 
-func (m *ApplicationCreated) GetUrn() string {
+func (m *ApplicationCreated) GetId() string {
 	if m != nil {
-		return m.Urn
+		return m.Id
 	}
 	return ""
 }
@@ -296,46 +476,288 @@ func (m *ApplicationCreated) GetLabel() string {
 	return ""
 }
 
+// ApplicationActivated is raised on application entity activation.
+type ApplicationActivated struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ApplicationActivated) Reset()         { *m = ApplicationActivated{} }
+func (m *ApplicationActivated) String() string { return proto.CompactTextString(m) }
+func (*ApplicationActivated) ProtoMessage()    {}
+func (*ApplicationActivated) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dbaf9ff3d9926480, []int{3}
+}
+
+func (m *ApplicationActivated) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+
+func (m *ApplicationActivated) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ApplicationActivated.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+
+func (m *ApplicationActivated) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationActivated.Merge(m, src)
+}
+
+func (m *ApplicationActivated) XXX_Size() int {
+	return m.Size()
+}
+
+func (m *ApplicationActivated) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationActivated.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationActivated proto.InternalMessageInfo
+
+func (m *ApplicationActivated) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+// ApplicationDeactivated is raised on application entity deactivation.
+type ApplicationDeactivated struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ApplicationDeactivated) Reset()         { *m = ApplicationDeactivated{} }
+func (m *ApplicationDeactivated) String() string { return proto.CompactTextString(m) }
+func (*ApplicationDeactivated) ProtoMessage()    {}
+func (*ApplicationDeactivated) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dbaf9ff3d9926480, []int{4}
+}
+
+func (m *ApplicationDeactivated) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+
+func (m *ApplicationDeactivated) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ApplicationDeactivated.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+
+func (m *ApplicationDeactivated) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationDeactivated.Merge(m, src)
+}
+
+func (m *ApplicationDeactivated) XXX_Size() int {
+	return m.Size()
+}
+
+func (m *ApplicationDeactivated) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationDeactivated.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationDeactivated proto.InternalMessageInfo
+
+func (m *ApplicationDeactivated) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+// ApplicationLabelChanged is raised on application entity label attribute is changed.
+type ApplicationLabelChanged struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Old                  string   `protobuf:"bytes,2,opt,name=old,proto3" json:"old,omitempty"`
+	New                  string   `protobuf:"bytes,3,opt,name=new,proto3" json:"new,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ApplicationLabelChanged) Reset()         { *m = ApplicationLabelChanged{} }
+func (m *ApplicationLabelChanged) String() string { return proto.CompactTextString(m) }
+func (*ApplicationLabelChanged) ProtoMessage()    {}
+func (*ApplicationLabelChanged) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dbaf9ff3d9926480, []int{5}
+}
+
+func (m *ApplicationLabelChanged) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+
+func (m *ApplicationLabelChanged) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ApplicationLabelChanged.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+
+func (m *ApplicationLabelChanged) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationLabelChanged.Merge(m, src)
+}
+
+func (m *ApplicationLabelChanged) XXX_Size() int {
+	return m.Size()
+}
+
+func (m *ApplicationLabelChanged) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationLabelChanged.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationLabelChanged proto.InternalMessageInfo
+
+func (m *ApplicationLabelChanged) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *ApplicationLabelChanged) GetOld() string {
+	if m != nil {
+		return m.Old
+	}
+	return ""
+}
+
+func (m *ApplicationLabelChanged) GetNew() string {
+	if m != nil {
+		return m.New
+	}
+	return ""
+}
+
+// ApplicationDeleted is raised on application entity deletion.
+type ApplicationDeleted struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ApplicationDeleted) Reset()         { *m = ApplicationDeleted{} }
+func (m *ApplicationDeleted) String() string { return proto.CompactTextString(m) }
+func (*ApplicationDeleted) ProtoMessage()    {}
+func (*ApplicationDeleted) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dbaf9ff3d9926480, []int{6}
+}
+
+func (m *ApplicationDeleted) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+
+func (m *ApplicationDeleted) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ApplicationDeleted.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+
+func (m *ApplicationDeleted) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationDeleted.Merge(m, src)
+}
+
+func (m *ApplicationDeleted) XXX_Size() int {
+	return m.Size()
+}
+
+func (m *ApplicationDeleted) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationDeleted.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationDeleted proto.InternalMessageInfo
+
+func (m *ApplicationDeleted) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterEnum("miam.events.v1.EventType", EventType_name, EventType_value)
 	proto.RegisterType((*Event)(nil), "miam.events.v1.Event")
+	proto.RegisterType((*Meta)(nil), "miam.events.v1.Meta")
 	proto.RegisterType((*ApplicationCreated)(nil), "miam.events.v1.ApplicationCreated")
+	proto.RegisterType((*ApplicationActivated)(nil), "miam.events.v1.ApplicationActivated")
+	proto.RegisterType((*ApplicationDeactivated)(nil), "miam.events.v1.ApplicationDeactivated")
+	proto.RegisterType((*ApplicationLabelChanged)(nil), "miam.events.v1.ApplicationLabelChanged")
+	proto.RegisterType((*ApplicationDeleted)(nil), "miam.events.v1.ApplicationDeleted")
 }
 
 func init() { proto.RegisterFile("miam/events/v1/events.proto", fileDescriptor_dbaf9ff3d9926480) }
 
 var fileDescriptor_dbaf9ff3d9926480 = []byte{
-	// 476 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x92, 0xcd, 0x6e, 0xd3, 0x40,
-	0x10, 0x80, 0xbb, 0xf9, 0x69, 0xc9, 0x04, 0xa2, 0x68, 0xa9, 0x90, 0x43, 0xa5, 0x28, 0x58, 0x05,
-	0x59, 0x1c, 0x1c, 0xb9, 0x5c, 0x38, 0x70, 0x71, 0x92, 0x95, 0xb0, 0x70, 0x5d, 0xcb, 0x72, 0xcc,
-	0x8f, 0x2a, 0x59, 0x9b, 0x7a, 0x31, 0x46, 0x8e, 0x6d, 0x39, 0x6e, 0x24, 0xf3, 0x38, 0x1c, 0x39,
-	0xf2, 0x14, 0x88, 0x13, 0x8f, 0x80, 0xf2, 0x1a, 0x5c, 0x90, 0x77, 0xd3, 0x04, 0x52, 0xa5, 0xb7,
-	0xd9, 0x6f, 0xbf, 0x99, 0xd5, 0xcc, 0x0e, 0x9c, 0xcc, 0x23, 0x3a, 0x1f, 0xb2, 0x25, 0x4b, 0x8a,
-	0xc5, 0x70, 0xa9, 0xad, 0x23, 0x35, 0xcb, 0xd3, 0x22, 0xc5, 0x9d, 0xea, 0x52, 0x5d, 0xa3, 0xa5,
-	0xf6, 0xb8, 0x17, 0xa6, 0x69, 0x18, 0xb3, 0x21, 0xbf, 0x9d, 0x5d, 0x7f, 0x1c, 0xd2, 0xa4, 0x14,
-	0xaa, 0xfc, 0xbd, 0x06, 0x4d, 0x52, 0x89, 0xf8, 0x25, 0x00, 0xcf, 0xf0, 0x8b, 0x32, 0x63, 0x12,
-	0x1a, 0x20, 0xa5, 0x73, 0xd6, 0x53, 0xff, 0xaf, 0xa4, 0x72, 0xd5, 0x2d, 0x33, 0xe6, 0xb4, 0xd8,
-	0x4d, 0x88, 0x7b, 0x70, 0x4f, 0x64, 0x46, 0x81, 0x54, 0x1b, 0x20, 0xa5, 0xe5, 0x1c, 0xf1, 0xb3,
-	0x11, 0xe0, 0xa7, 0xd0, 0xa1, 0x61, 0x98, 0xb3, 0x90, 0x16, 0x4c, 0x14, 0xae, 0x73, 0xe1, 0xc1,
-	0x86, 0xf2, 0x0a, 0x4f, 0xe0, 0xfe, 0x56, 0x8b, 0x02, 0xa9, 0xc1, 0xa5, 0xf6, 0x86, 0x19, 0x01,
-	0x56, 0xa0, 0x31, 0x67, 0x05, 0x95, 0x9a, 0x03, 0xa4, 0xb4, 0xcf, 0x8e, 0x55, 0xd1, 0x92, 0x7a,
-	0xd3, 0x92, 0xaa, 0x27, 0xa5, 0xc3, 0x0d, 0x3c, 0x85, 0x87, 0x34, 0xcb, 0xe2, 0xe8, 0x8a, 0x16,
-	0x51, 0x9a, 0xf8, 0x57, 0x39, 0xa3, 0x05, 0x0b, 0x24, 0xe0, 0x89, 0xf2, 0x6e, 0x47, 0xfa, 0x56,
-	0x1d, 0x0b, 0xf3, 0xf5, 0x81, 0x83, 0xe9, 0x2d, 0x3a, 0x6a, 0xc1, 0x51, 0x46, 0xcb, 0x38, 0xa5,
-	0x81, 0xfc, 0x0a, 0xf0, 0xed, 0x34, 0xdc, 0x85, 0xfa, 0x75, 0x9e, 0xf0, 0xc9, 0xb5, 0x9c, 0x2a,
-	0xc4, 0xc7, 0xd0, 0x8c, 0xe9, 0x8c, 0xc5, 0xeb, 0xa9, 0x88, 0xc3, 0xf3, 0x3f, 0x08, 0x5a, 0x9b,
-	0x39, 0xe2, 0x47, 0x80, 0x89, 0x47, 0x2c, 0xd7, 0x77, 0xdf, 0xdb, 0xc4, 0x37, 0x2c, 0x4f, 0x37,
-	0x8d, 0x49, 0xf7, 0x60, 0x87, 0x4f, 0xad, 0x37, 0xd6, 0xc5, 0x5b, 0xab, 0x8b, 0xb0, 0x0c, 0xfd,
-	0x7f, 0xb8, 0x6e, 0xdb, 0xa6, 0x31, 0xd6, 0x5d, 0xe3, 0xc2, 0xf2, 0xc7, 0x0e, 0xd1, 0x5d, 0x32,
-	0xe9, 0xd6, 0xee, 0x70, 0x26, 0xc4, 0x24, 0x95, 0x53, 0xc7, 0x0a, 0x9c, 0xee, 0x71, 0x4c, 0x7d,
-	0x44, 0x4c, 0x7f, 0x6a, 0x4f, 0x78, 0xb5, 0x06, 0x3e, 0x85, 0xc1, 0x1e, 0x53, 0x1f, 0xbb, 0x86,
-	0xc7, 0xad, 0x26, 0x7e, 0x06, 0xf2, 0xde, 0x37, 0xb7, 0xde, 0xe1, 0xe8, 0xf3, 0x8f, 0x55, 0x1f,
-	0xfd, 0x5a, 0xf5, 0xd1, 0xef, 0x55, 0x1f, 0xc1, 0x49, 0x9a, 0x87, 0xea, 0x17, 0x96, 0x44, 0xc5,
-	0x27, 0x9a, 0xef, 0x7c, 0xcd, 0xa8, 0xcd, 0xa7, 0xb4, 0xb0, 0xab, 0x2f, 0xb6, 0xd1, 0x07, 0xb1,
-	0x64, 0x8b, 0xa5, 0xf6, 0xb5, 0x56, 0x3f, 0x27, 0xef, 0xbe, 0xd5, 0x3a, 0xe7, 0x95, 0x2f, 0x24,
-	0xd5, 0xd3, 0x7e, 0x0a, 0x70, 0x29, 0xc0, 0xa5, 0xa7, 0xcd, 0x0e, 0xf9, 0x76, 0xbc, 0xf8, 0x1b,
-	0x00, 0x00, 0xff, 0xff, 0xdd, 0xd4, 0x52, 0x05, 0x2d, 0x03, 0x00, 0x00,
+	// 622 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x94, 0xcb, 0x6e, 0x9b, 0x4c,
+	0x14, 0xc7, 0x8d, 0x2f, 0xc9, 0xe7, 0xe3, 0xc4, 0xb2, 0xe6, 0x73, 0x13, 0xa2, 0x48, 0xae, 0x8b,
+	0xdc, 0x14, 0x75, 0x41, 0xe4, 0x74, 0x53, 0x75, 0x87, 0x0d, 0x92, 0x51, 0x31, 0x41, 0x88, 0xb8,
+	0xb7, 0x48, 0x68, 0x62, 0x46, 0x0e, 0x15, 0x31, 0x08, 0x53, 0x57, 0xe9, 0xe3, 0x74, 0xd9, 0x55,
+	0x1f, 0xa3, 0xea, 0xaa, 0x8f, 0x50, 0xe5, 0x35, 0xba, 0xa9, 0x66, 0x20, 0x36, 0xc1, 0x97, 0xee,
+	0x66, 0xfe, 0xf3, 0x9b, 0xff, 0x99, 0x39, 0xe7, 0xcc, 0xc0, 0xf1, 0x8d, 0x87, 0x6f, 0x4e, 0xc9,
+	0x9c, 0x4c, 0xe3, 0xd9, 0xe9, 0xbc, 0x9b, 0x8e, 0xa4, 0x30, 0x0a, 0xe2, 0x00, 0xd5, 0xe9, 0xa2,
+	0x94, 0x4a, 0xf3, 0xae, 0xf0, 0xbd, 0x02, 0x15, 0x95, 0xce, 0xd0, 0x4b, 0x00, 0x26, 0x3b, 0xf1,
+	0x6d, 0x48, 0x78, 0xae, 0xcd, 0x89, 0xf5, 0xb3, 0x23, 0xe9, 0x21, 0x2e, 0x31, 0xd4, 0xbe, 0x0d,
+	0x89, 0x55, 0x25, 0xf7, 0x43, 0x74, 0x04, 0xff, 0x25, 0x3b, 0x3d, 0x97, 0x2f, 0xb6, 0x39, 0xb1,
+	0x6a, 0xed, 0xb2, 0xb9, 0xe6, 0xa2, 0xa7, 0x50, 0xc7, 0x93, 0x49, 0x44, 0x26, 0x38, 0x26, 0x89,
+	0x71, 0x89, 0x01, 0xfb, 0x0b, 0x95, 0x39, 0x3c, 0x81, 0xbd, 0x25, 0xe6, 0xb9, 0x7c, 0x99, 0x41,
+	0xb5, 0x85, 0xa6, 0xb9, 0x48, 0x84, 0xf2, 0x0d, 0x89, 0x31, 0x5f, 0x69, 0x73, 0x62, 0xed, 0xac,
+	0x99, 0x3f, 0xd8, 0x90, 0xc4, 0xd8, 0x62, 0x04, 0xba, 0x80, 0xff, 0x71, 0x18, 0xfa, 0xde, 0x18,
+	0xc7, 0x5e, 0x30, 0x75, 0xc6, 0x11, 0xc1, 0x31, 0x71, 0x79, 0x60, 0x1b, 0x85, 0xfc, 0x46, 0x79,
+	0x89, 0xf6, 0x13, 0x72, 0x50, 0xb0, 0x10, 0x5e, 0x51, 0xd1, 0x07, 0x78, 0x94, 0xb5, 0xc5, 0xe3,
+	0xd8, 0x9b, 0x33, 0xe3, 0x1a, 0x33, 0xee, 0x6c, 0x31, 0x96, 0xef, 0xd9, 0x41, 0xc1, 0x6a, 0xe2,
+	0x35, 0x3a, 0xc2, 0x70, 0x98, 0x35, 0x77, 0xc9, 0xd2, 0x7e, 0x8f, 0xd9, 0x9f, 0x6c, 0xb1, 0x57,
+	0x96, 0xf4, 0xa0, 0x60, 0x1d, 0xe0, 0xb5, 0x2b, 0x88, 0xc0, 0x51, 0x36, 0x84, 0x8f, 0xaf, 0x88,
+	0xef, 0x8c, 0xaf, 0xf1, 0x74, 0x42, 0x5c, 0x7e, 0x9f, 0x05, 0x79, 0xb6, 0x25, 0x88, 0x4e, 0xf9,
+	0x7e, 0x82, 0x0f, 0x0a, 0x56, 0xf6, 0xb8, 0xd9, 0xa5, 0x7c, 0xf6, 0x5d, 0xe2, 0x13, 0x7a, 0x8b,
+	0xfa, 0x3f, 0xb3, 0xaf, 0x24, 0x64, 0x2e, 0xfb, 0xa9, 0xda, 0xab, 0xc2, 0x6e, 0x88, 0x6f, 0xfd,
+	0x00, 0xbb, 0xc2, 0x63, 0x28, 0xd3, 0x6a, 0xa3, 0x43, 0xd8, 0xfd, 0x34, 0x23, 0x11, 0xed, 0x17,
+	0x8e, 0xf5, 0xcb, 0x0e, 0x9d, 0x6a, 0xae, 0xf0, 0x0a, 0xd0, 0x6a, 0x55, 0x51, 0x1d, 0x8a, 0x0b,
+	0xb2, 0xe8, 0xb9, 0xa8, 0x09, 0x15, 0x96, 0x83, 0xb4, 0x65, 0x93, 0x89, 0x70, 0x02, 0xcd, 0x75,
+	0x85, 0xcb, 0xef, 0x16, 0x44, 0x38, 0x58, 0x5f, 0x81, 0x15, 0x72, 0x08, 0x87, 0x1b, 0xd2, 0xb8,
+	0x72, 0xa4, 0x06, 0x94, 0x02, 0xff, 0xfe, 0x0d, 0xd1, 0x21, 0x55, 0xa6, 0xe4, 0x73, 0xfa, 0x68,
+	0xe8, 0x50, 0xe8, 0x3c, 0xb8, 0x5c, 0x9a, 0x9e, 0xbc, 0xd3, 0xf3, 0x3f, 0x1c, 0x54, 0x17, 0x6f,
+	0x15, 0x1d, 0x00, 0x52, 0x47, 0xaa, 0x61, 0x3b, 0xf6, 0x3b, 0x53, 0x75, 0x34, 0x63, 0x24, 0xeb,
+	0x9a, 0xd2, 0x28, 0xe4, 0xf4, 0x0b, 0xe3, 0xb5, 0x71, 0xfe, 0xc6, 0x68, 0x70, 0x48, 0x80, 0x56,
+	0x46, 0x97, 0x4d, 0x53, 0xd7, 0xfa, 0xb2, 0xad, 0x9d, 0x1b, 0x4e, 0xdf, 0x52, 0x65, 0x5b, 0x55,
+	0x1a, 0xc5, 0x2d, 0x8c, 0xa2, 0xea, 0x2a, 0x65, 0x4a, 0x48, 0x84, 0xce, 0x06, 0x46, 0x97, 0x7b,
+	0xaa, 0xee, 0x5c, 0x98, 0x0a, 0x73, 0x2b, 0xa3, 0x0e, 0xb4, 0x37, 0x90, 0x72, 0xdf, 0xd6, 0x46,
+	0x8c, 0xaa, 0xa0, 0x13, 0x10, 0x36, 0xc6, 0x5c, 0x72, 0x3b, 0xbd, 0x8f, 0x3f, 0xee, 0x5a, 0xdc,
+	0xaf, 0xbb, 0x16, 0xf7, 0xfb, 0xae, 0xc5, 0xc1, 0x71, 0x10, 0x4d, 0xa4, 0x2f, 0x64, 0xea, 0xc5,
+	0xd7, 0x38, 0xca, 0x35, 0x60, 0xaf, 0xc6, 0xb2, 0x34, 0x33, 0xe9, 0xe7, 0x68, 0x72, 0xef, 0x93,
+	0x8f, 0x6c, 0x36, 0xef, 0x7e, 0x2d, 0x96, 0x86, 0xea, 0xdb, 0x6f, 0xc5, 0xfa, 0x90, 0xf2, 0x09,
+	0x24, 0x8d, 0xba, 0x3f, 0x13, 0xe1, 0x32, 0x11, 0x2e, 0x47, 0xdd, 0xab, 0x1d, 0xf6, 0xaf, 0xbe,
+	0xf8, 0x1b, 0x00, 0x00, 0xff, 0xff, 0x69, 0xf9, 0x03, 0xf1, 0x76, 0x05, 0x00, 0x00,
 }
 
 func (m *Event) Marshal() (dAtA []byte, err error) {
@@ -414,6 +836,93 @@ func (m *Event_ApplicationCreated) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *Event_ApplicationActivated) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.ApplicationActivated != nil {
+		dAtA[i] = 0x5a
+		i++
+		i = encodeVarintEvents(dAtA, i, uint64(m.ApplicationActivated.Size()))
+		n4, err := m.ApplicationActivated.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
+	}
+	return i, nil
+}
+
+func (m *Event_ApplicationDeactivated) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.ApplicationDeactivated != nil {
+		dAtA[i] = 0x62
+		i++
+		i = encodeVarintEvents(dAtA, i, uint64(m.ApplicationDeactivated.Size()))
+		n5, err := m.ApplicationDeactivated.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	return i, nil
+}
+
+func (m *Event_ApplicationLabelChanged) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.ApplicationLabelChanged != nil {
+		dAtA[i] = 0x6a
+		i++
+		i = encodeVarintEvents(dAtA, i, uint64(m.ApplicationLabelChanged.Size()))
+		n6, err := m.ApplicationLabelChanged.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	return i, nil
+}
+
+func (m *Event_ApplicationDeleted) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.ApplicationDeleted != nil {
+		dAtA[i] = 0x72
+		i++
+		i = encodeVarintEvents(dAtA, i, uint64(m.ApplicationDeleted.Size()))
+		n7, err := m.ApplicationDeleted.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n7
+	}
+	return i, nil
+}
+
+func (m *Meta) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Meta) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.UserId) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.UserId)))
+		i += copy(dAtA[i:], m.UserId)
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
 func (m *ApplicationCreated) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -429,17 +938,137 @@ func (m *ApplicationCreated) MarshalTo(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Urn) > 0 {
+	if len(m.Id) > 0 {
 		dAtA[i] = 0xa
 		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Urn)))
-		i += copy(dAtA[i:], m.Urn)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
+		i += copy(dAtA[i:], m.Id)
 	}
 	if len(m.Label) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.Label)))
 		i += copy(dAtA[i:], m.Label)
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *ApplicationActivated) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationActivated) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Id) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
+		i += copy(dAtA[i:], m.Id)
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *ApplicationDeactivated) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationDeactivated) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Id) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
+		i += copy(dAtA[i:], m.Id)
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *ApplicationLabelChanged) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationLabelChanged) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Id) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
+		i += copy(dAtA[i:], m.Id)
+	}
+	if len(m.Old) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Old)))
+		i += copy(dAtA[i:], m.Old)
+	}
+	if len(m.New) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.New)))
+		i += copy(dAtA[i:], m.New)
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *ApplicationDeleted) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationDeleted) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Id) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
+		i += copy(dAtA[i:], m.Id)
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
@@ -504,17 +1133,157 @@ func (m *Event_ApplicationCreated) Size() (n int) {
 	return n
 }
 
+func (m *Event_ApplicationActivated) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ApplicationActivated != nil {
+		l = m.ApplicationActivated.Size()
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	return n
+}
+
+func (m *Event_ApplicationDeactivated) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ApplicationDeactivated != nil {
+		l = m.ApplicationDeactivated.Size()
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	return n
+}
+
+func (m *Event_ApplicationLabelChanged) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ApplicationLabelChanged != nil {
+		l = m.ApplicationLabelChanged.Size()
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	return n
+}
+
+func (m *Event_ApplicationDeleted) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ApplicationDeleted != nil {
+		l = m.ApplicationDeleted.Size()
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	return n
+}
+
+func (m *Meta) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.UserId)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
 func (m *ApplicationCreated) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.Urn)
+	l = len(m.Id)
 	if l > 0 {
 		n += 1 + l + sovEvents(uint64(l))
 	}
 	l = len(m.Label)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *ApplicationActivated) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *ApplicationDeactivated) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *ApplicationLabelChanged) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	l = len(m.Old)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	l = len(m.New)
+	if l > 0 {
+		n += 1 + l + sovEvents(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *ApplicationDeleted) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
 	if l > 0 {
 		n += 1 + l + sovEvents(uint64(l))
 	}
@@ -713,7 +1482,7 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Meta == nil {
-				m.Meta = &types.Any{}
+				m.Meta = &Meta{}
 			}
 			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -753,6 +1522,233 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			m.Payload = &Event_ApplicationCreated{v}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationActivated", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ApplicationActivated{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Payload = &Event_ApplicationActivated{v}
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationDeactivated", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ApplicationDeactivated{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Payload = &Event_ApplicationDeactivated{v}
+			iNdEx = postIndex
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationLabelChanged", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ApplicationLabelChanged{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Payload = &Event_ApplicationLabelChanged{v}
+			iNdEx = postIndex
+		case 14:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationDeleted", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ApplicationDeleted{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Payload = &Event_ApplicationDeleted{v}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvents(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+
+func (m *Meta) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvents
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Meta: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Meta: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -811,7 +1807,7 @@ func (m *ApplicationCreated) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Urn", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -839,7 +1835,7 @@ func (m *ApplicationCreated) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Urn = string(dAtA[iNdEx:postIndex])
+			m.Id = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -872,6 +1868,418 @@ func (m *ApplicationCreated) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Label = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvents(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+
+func (m *ApplicationActivated) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvents
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ApplicationActivated: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ApplicationActivated: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvents(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+
+func (m *ApplicationDeactivated) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvents
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ApplicationDeactivated: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ApplicationDeactivated: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvents(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+
+func (m *ApplicationLabelChanged) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvents
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ApplicationLabelChanged: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ApplicationLabelChanged: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Old", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Old = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field New", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.New = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvents(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+
+func (m *ApplicationDeleted) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvents
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ApplicationDeleted: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ApplicationDeleted: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvents
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvents
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvents
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

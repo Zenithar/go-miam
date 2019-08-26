@@ -14,22 +14,102 @@
 
 package events
 
+import (
+	"context"
+
+	"go.zenithar.org/miam/internal/helpers"
+	"go.zenithar.org/miam/internal/reactor/internal/meta"
+	eventsv1 "go.zenithar.org/miam/pkg/gen/go/miam/events/v1"
+)
+
+const (
+	aggregateType = "application"
+)
+
 // ApplicationCreated is raised when an application domain has been created.
-func ApplicationCreated(id, label string) interface{} {
-	return nil
+func ApplicationCreated(ctx context.Context, id, label string) *eventsv1.Event {
+	// Build event
+	return &eventsv1.Event{
+		EventType:     eventsv1.EventType_EVENT_TYPE_APPLICATION_CREATED,
+		EventId:       helpers.EventIDGeneratorFunc(),
+		AggregateType: aggregateType,
+		AggregateId:   id,
+		Meta:          meta.FromContext(ctx),
+		Payload: &eventsv1.Event_ApplicationCreated{
+			ApplicationCreated: &eventsv1.ApplicationCreated{
+				Id:    id,
+				Label: label,
+			},
+		},
+	}
 }
 
 // ApplicationActivated is raised when an application domain has been activated.
-func ApplicationActivated(id string) interface{} {
-	return nil
+func ApplicationActivated(ctx context.Context, id string) interface{} {
+	// Build event
+	return &eventsv1.Event{
+		EventType:     eventsv1.EventType_EVENT_TYPE_APPLICATION_ACTIVATED,
+		EventId:       helpers.EventIDGeneratorFunc(),
+		AggregateType: aggregateType,
+		AggregateId:   id,
+		Meta:          meta.FromContext(ctx),
+		Payload: &eventsv1.Event_ApplicationActivated{
+			ApplicationActivated: &eventsv1.ApplicationActivated{
+				Id: id,
+			},
+		},
+	}
 }
 
-// ApplicationDisabled is raised when an application domain has been disabled.
-func ApplicationDisabled(id string) interface{} {
-	return nil
+// ApplicationDeactivated is raised when an application domain has been deactivated.
+func ApplicationDeactivated(ctx context.Context, id string) interface{} {
+	// Build event
+	return &eventsv1.Event{
+		EventType:     eventsv1.EventType_EVENT_TYPE_APPLICATION_DEACTIVATED,
+		EventId:       helpers.EventIDGeneratorFunc(),
+		AggregateType: aggregateType,
+		AggregateId:   id,
+		Meta:          meta.FromContext(ctx),
+		Payload: &eventsv1.Event_ApplicationDeactivated{
+			ApplicationDeactivated: &eventsv1.ApplicationDeactivated{
+				Id: id,
+			},
+		},
+	}
 }
 
-// ApplicationLabelChanged is raised when an application label attribute has been changed.
-func ApplicationLabelChanged(id, old, new string) interface{} {
-	return nil
+// ApplicationDeleted is raised when an application entity has been deleted.
+func ApplicationDeleted(ctx context.Context, id string) interface{} {
+	// Build event
+	return &eventsv1.Event{
+		EventType:     eventsv1.EventType_EVENT_TYPE_APPLICATION_DELETED,
+		EventId:       helpers.EventIDGeneratorFunc(),
+		AggregateType: aggregateType,
+		AggregateId:   id,
+		Meta:          meta.FromContext(ctx),
+		Payload: &eventsv1.Event_ApplicationDeleted{
+			ApplicationDeleted: &eventsv1.ApplicationDeleted{
+				Id: id,
+			},
+		},
+	}
+}
+
+// ApplicationLabelChanged is raised when an application label attribute value has changed.
+func ApplicationLabelChanged(ctx context.Context, id, old, new string) interface{} {
+	// Build event
+	return &eventsv1.Event{
+		EventType:     eventsv1.EventType_EVENT_TYPE_APPLICATION_LABEL_UPDATED,
+		EventId:       helpers.EventIDGeneratorFunc(),
+		AggregateType: aggregateType,
+		AggregateId:   id,
+		Meta:          meta.FromContext(ctx),
+		Payload: &eventsv1.Event_ApplicationLabelChanged{
+			ApplicationLabelChanged: &eventsv1.ApplicationLabelChanged{
+				Id:  id,
+				Old: old,
+				New: new,
+			},
+		},
+	}
 }

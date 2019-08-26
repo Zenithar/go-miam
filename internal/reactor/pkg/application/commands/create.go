@@ -49,7 +49,7 @@ var CreateHandler = func(creator repositories.ApplicationCreator) reactor.Handle
 		}
 
 		// Publish event
-		events.ApplicationCreated(entity.URN(), entity.Label)
+		events.ApplicationCreated(ctx, entity.URN(), entity.Label)
 
 		// Prepare result and return
 		return nil, nil
