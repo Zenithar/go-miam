@@ -25,6 +25,7 @@ import (
 type User struct {
 	ID        string    `json:"id"`
 	Principal string    `json:"principal"`
+	Secret    string    `json:"secret"`
 	Active    bool      `json:"active"`
 	CreateAt  time.Time `json:"created_at"`
 }
@@ -40,6 +41,17 @@ func NewUser(principal string) *User {
 }
 
 // -----------------------------------------------------------------------------
+
+// SetSecret updates the secret attribute value.
+func (u *User) SetSecret(secret string) error {
+	encoded, err := helpers.PasswordEncodingFunc(secret)
+	if err != nil {
+		return err
+	}
+
+	u.Secret = encoded
+	return nil
+}
 
 // URN returns the entity URN
 func (u *User) URN() string {
