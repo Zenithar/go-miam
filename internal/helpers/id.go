@@ -12,4 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package miam
+package helpers
+
+import "github.com/dchest/uniuri"
+
+// IDGeneratorFunc is the identifier generator function for entities.
+var IDGeneratorFunc = func() string {
+	return uniuri.NewLen(32)
+}

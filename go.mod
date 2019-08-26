@@ -24,5 +24,6 @@ require (
 	go.zenithar.org/protoc-gen-cobra v0.0.3 // indirect
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
 	google.golang.org/grpc v1.22.1
+	gotest.tools/gotestsum v0.3.5 // indirect
 	mvdan.cc/gofumpt v0.0.0-20190729090447-96300e3d49fb // indirect
 )
