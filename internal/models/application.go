@@ -19,6 +19,9 @@ import (
 	"time"
 
 	"go.zenithar.org/miam/internal/helpers"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
 )
 
 // Application describes a resource provider in term of OIDC.
@@ -40,6 +43,14 @@ func NewApplication(label string) *Application {
 }
 
 // -----------------------------------------------------------------------------
+
+// Validate entity constraints
+func (app *Application) Validate() error {
+	return validation.ValidateStruct(app,
+		validation.Field(&app.ID, helpers.IDValidationRules...),
+		validation.Field(&app.Label, validation.Required, is.PrintableASCII, validation.Length(2, 50)),
+	)
+}
 
 // URN returns the entity URN
 func (app *Application) URN() string {

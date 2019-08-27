@@ -30,7 +30,7 @@ import (
 )
 
 // CreateHandler returns a Create command event handler.
-var CreateHandler = func(tx repositories.Transactional, creator repositories.ApplicationCreator, reader repositories.ApplicationReader, publisher broker.Publisher) reactor.HandlerFunc {
+var CreateHandler = func(creator repositories.ApplicationCreator, reader repositories.ApplicationReader, publisher broker.Publisher) reactor.HandlerFunc {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
 		res := &applicationv1.CreateResponse{}
 

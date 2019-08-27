@@ -3,9 +3,11 @@ module go.zenithar.org/miam
 go 1.13
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20190529165535-67e0ed34491a
 	github.com/dchest/uniuri v0.0.0-20160212164326-8902c56451e9
 	github.com/fatih/color v1.7.0
+	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/gogo/protobuf v1.2.1
 	github.com/golang/protobuf v1.3.1
 	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe
@@ -15,7 +17,7 @@ require (
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/onsi/ginkgo v1.9.0 // indirect
-	github.com/onsi/gomega v1.6.0 // indirect
+	github.com/onsi/gomega v1.6.0
 	github.com/spf13/cobra v0.0.4
 	github.com/spf13/pflag v1.0.3
 	go.zenithar.org/butcher v1.0.0
