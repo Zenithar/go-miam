@@ -32,7 +32,7 @@ func (Gen) Wire() {
 func (Gen) Mocks() {
 	color.Blue("### Mocks")
 
-	// mustGoGenerate("Repositories", "go.zenithar.org/spotigraph/internal/repositories")
+	mustGoGenerate("Repositories", "go.zenithar.org/miam/internal/repositories")
 	// mustGoGenerate("Services", "go.zenithar.org/spotigraph/internal/services")
 }
 

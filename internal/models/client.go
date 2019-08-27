@@ -30,6 +30,7 @@ type Client struct {
 	ID            string            `json:"id"`
 	Label         string            `json:"label"`
 	Secret        string            `json:"secret"`
+	PublicKey     string            `json:"public_key"`
 	RedirectURIs  types.StringArray `json:"redirect_uris"`
 	GrantTypes    types.StringArray `json:"grant_types"`
 	ResponseTypes types.StringArray `json:"response_types"`

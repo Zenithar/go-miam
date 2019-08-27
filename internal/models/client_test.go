@@ -31,6 +31,7 @@ func TestClient_Creation(t *testing.T) {
 	g.Expect(obj).ToNot(BeNil(), "Entity should not be nil")
 	g.Expect(obj.ID).ToNot(BeEmpty(), "Entity ID should not be blank")
 	g.Expect(obj.Label).To(Equal("foo"), "Entity should have the matching label")
+	g.Expect(obj.PublicKey).To(Equal(""), "Entity should have the matching public_key")
 	g.Expect(obj.Active).To(BeFalse(), "Entity must be deactivated by default")
 	g.Expect(obj.CreateAt).Should(BeTemporally("~", time.Now(), time.Second), "Entity should have creation date")
 	g.Expect(obj.RedirectURIs).Should(BeEmpty(), "Entity redirect_uris should be empty")

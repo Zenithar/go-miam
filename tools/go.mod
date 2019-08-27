@@ -9,6 +9,7 @@ require (
 	github.com/fatih/color v1.7.0
 	github.com/frapposelli/wwhrd v0.2.4
 	github.com/gogo/protobuf v1.2.1
+	github.com/golang/mock v1.1.1
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365 // indirect
 	github.com/izumin5210/gex v0.5.0 // indirect
 	github.com/magefile/mage v1.8.0
