@@ -19,6 +19,9 @@ import (
 	"time"
 
 	"go.zenithar.org/miam/internal/helpers"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
 	"go.zenithar.org/pkg/types"
 )
 
@@ -49,15 +52,19 @@ func NewClient(label string) *Client {
 
 // -----------------------------------------------------------------------------
 
-// SetSecret updates the secret attribute value.
-func (c *Client) SetSecret(secret string) error {
-	encoded, err := helpers.PasswordEncodingFunc(secret)
-	if err != nil {
-		return err
-	}
+// Validate entity constraints
+func (c *Client) Validate() error {
+	return validation.ValidateStruct(c,
+		validation.Field(&c.ID, helpers.IDValidationRules...),
+		validation.Field(&c.Label, validation.Required, is.PrintableASCII),
+		validation.Field(&c.Secret, validation.Required, is.PrintableASCII),
+	)
+}
 
-	c.Secret = encoded
-	return nil
+// SetSecret updates the secret attribute value.
+func (c *Client) SetSecret(secret string) (err error) {
+	c.Secret, err = helpers.PasswordEncodingFunc(secret)
+	return err
 }
 
 // URN returns the entity URN

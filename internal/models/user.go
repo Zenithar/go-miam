@@ -19,6 +19,9 @@ import (
 	"time"
 
 	"go.zenithar.org/miam/internal/helpers"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
 )
 
 // User describes a user identity.
@@ -42,15 +45,19 @@ func NewUser(principal string) *User {
 
 // -----------------------------------------------------------------------------
 
-// SetSecret updates the secret attribute value.
-func (u *User) SetSecret(secret string) error {
-	encoded, err := helpers.PasswordEncodingFunc(secret)
-	if err != nil {
-		return err
-	}
+// Validate entity constraints
+func (u *User) Validate() error {
+	return validation.ValidateStruct(u,
+		validation.Field(&u.ID, helpers.IDValidationRules...),
+		validation.Field(&u.Principal, validation.Required, is.PrintableASCII),
+		validation.Field(&u.Secret, validation.Required, is.PrintableASCII),
+	)
+}
 
-	u.Secret = encoded
-	return nil
+// SetSecret updates the secret attribute value.
+func (u *User) SetSecret(secret string) (err error) {
+	u.Secret, err = helpers.PasswordEncodingFunc(secret)
+	return err
 }
 
 // URN returns the entity URN

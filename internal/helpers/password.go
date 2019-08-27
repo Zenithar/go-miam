@@ -31,6 +31,8 @@ var (
 func init() {
 	once.Do(func() {
 		encoder, err = butcher.New(
+			butcher.WithAlgorithm(butcher.DefaultAlgorithm),
+			butcher.WithSaltFunc(butcher.RandomNonce(32)),
 			butcher.WithPepper(pepperBytes),
 		)
 		if err != nil {
