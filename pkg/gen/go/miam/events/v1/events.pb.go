@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 
 	proto "github.com/gogo/protobuf/proto"
 )
@@ -20,7 +21,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // EventType enumerates all event type values.
 type EventType int32
@@ -100,7 +101,7 @@ func (m *Event) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Event.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -231,135 +232,15 @@ func (m *Event) GetApplicationDeleted() *ApplicationDeleted {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Event) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Event_OneofMarshaler, _Event_OneofUnmarshaler, _Event_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Event) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*Event_ApplicationCreated)(nil),
 		(*Event_ApplicationActivated)(nil),
 		(*Event_ApplicationDeactivated)(nil),
 		(*Event_ApplicationLabelChanged)(nil),
 		(*Event_ApplicationDeleted)(nil),
 	}
-}
-
-func _Event_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Event)
-	// payload
-	switch x := m.Payload.(type) {
-	case *Event_ApplicationCreated:
-		_ = b.EncodeVarint(10<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ApplicationCreated); err != nil {
-			return err
-		}
-	case *Event_ApplicationActivated:
-		_ = b.EncodeVarint(11<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ApplicationActivated); err != nil {
-			return err
-		}
-	case *Event_ApplicationDeactivated:
-		_ = b.EncodeVarint(12<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ApplicationDeactivated); err != nil {
-			return err
-		}
-	case *Event_ApplicationLabelChanged:
-		_ = b.EncodeVarint(13<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ApplicationLabelChanged); err != nil {
-			return err
-		}
-	case *Event_ApplicationDeleted:
-		_ = b.EncodeVarint(14<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ApplicationDeleted); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("Event.Payload has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Event_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Event)
-	switch tag {
-	case 10: // payload.application_created
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationCreated)
-		err := b.DecodeMessage(msg)
-		m.Payload = &Event_ApplicationCreated{msg}
-		return true, err
-	case 11: // payload.application_activated
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationActivated)
-		err := b.DecodeMessage(msg)
-		m.Payload = &Event_ApplicationActivated{msg}
-		return true, err
-	case 12: // payload.application_deactivated
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationDeactivated)
-		err := b.DecodeMessage(msg)
-		m.Payload = &Event_ApplicationDeactivated{msg}
-		return true, err
-	case 13: // payload.application_label_changed
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationLabelChanged)
-		err := b.DecodeMessage(msg)
-		m.Payload = &Event_ApplicationLabelChanged{msg}
-		return true, err
-	case 14: // payload.application_deleted
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationDeleted)
-		err := b.DecodeMessage(msg)
-		m.Payload = &Event_ApplicationDeleted{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Event_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Event)
-	// payload
-	switch x := m.Payload.(type) {
-	case *Event_ApplicationCreated:
-		s := proto.Size(x.ApplicationCreated)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Event_ApplicationActivated:
-		s := proto.Size(x.ApplicationActivated)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Event_ApplicationDeactivated:
-		s := proto.Size(x.ApplicationDeactivated)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Event_ApplicationLabelChanged:
-		s := proto.Size(x.ApplicationLabelChanged)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Event_ApplicationDeleted:
-		s := proto.Size(x.ApplicationDeleted)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // Meta decribes event metadata.
@@ -386,7 +267,7 @@ func (m *Meta) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Meta.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -440,7 +321,7 @@ func (m *ApplicationCreated) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return xxx_messageInfo_ApplicationCreated.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -500,7 +381,7 @@ func (m *ApplicationActivated) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_ApplicationActivated.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -553,7 +434,7 @@ func (m *ApplicationDeactivated) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_ApplicationDeactivated.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -608,7 +489,7 @@ func (m *ApplicationLabelChanged) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_ApplicationLabelChanged.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -675,7 +556,7 @@ func (m *ApplicationDeleted) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return xxx_messageInfo_ApplicationDeleted.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -763,7 +644,7 @@ var fileDescriptor_dbaf9ff3d9926480 = []byte{
 func (m *Event) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -771,135 +652,178 @@ func (m *Event) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Event) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Event) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.EventType != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(m.EventType))
-	}
-	if len(m.EventId) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.EventId)))
-		i += copy(dAtA[i:], m.EventId)
-	}
-	if len(m.AggregateType) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.AggregateType)))
-		i += copy(dAtA[i:], m.AggregateType)
-	}
-	if len(m.AggregateId) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.AggregateId)))
-		i += copy(dAtA[i:], m.AggregateId)
-	}
-	if m.Meta != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(m.Meta.Size()))
-		n1, err := m.Meta.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if m.Payload != nil {
-		nn2, err := m.Payload.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.Payload.Size()
+			i -= size
+			if _, err := m.Payload.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
-		i += nn2
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.Meta != nil {
+		{
+			size, err := m.Meta.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvents(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
 	}
-	return i, nil
+	if len(m.AggregateId) > 0 {
+		i -= len(m.AggregateId)
+		copy(dAtA[i:], m.AggregateId)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.AggregateId)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.AggregateType) > 0 {
+		i -= len(m.AggregateType)
+		copy(dAtA[i:], m.AggregateType)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.AggregateType)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.EventId) > 0 {
+		i -= len(m.EventId)
+		copy(dAtA[i:], m.EventId)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.EventId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.EventType != 0 {
+		i = encodeVarintEvents(dAtA, i, uint64(m.EventType))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *Event_ApplicationCreated) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *Event_ApplicationCreated) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.ApplicationCreated != nil {
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(m.ApplicationCreated.Size()))
-		n3, err := m.ApplicationCreated.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.ApplicationCreated.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvents(dAtA, i, uint64(size))
 		}
-		i += n3
+		i--
+		dAtA[i] = 0x52
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *Event_ApplicationActivated) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *Event_ApplicationActivated) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.ApplicationActivated != nil {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(m.ApplicationActivated.Size()))
-		n4, err := m.ApplicationActivated.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.ApplicationActivated.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvents(dAtA, i, uint64(size))
 		}
-		i += n4
+		i--
+		dAtA[i] = 0x5a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *Event_ApplicationDeactivated) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *Event_ApplicationDeactivated) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.ApplicationDeactivated != nil {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(m.ApplicationDeactivated.Size()))
-		n5, err := m.ApplicationDeactivated.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.ApplicationDeactivated.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvents(dAtA, i, uint64(size))
 		}
-		i += n5
+		i--
+		dAtA[i] = 0x62
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *Event_ApplicationLabelChanged) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *Event_ApplicationLabelChanged) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.ApplicationLabelChanged != nil {
-		dAtA[i] = 0x6a
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(m.ApplicationLabelChanged.Size()))
-		n6, err := m.ApplicationLabelChanged.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.ApplicationLabelChanged.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvents(dAtA, i, uint64(size))
 		}
-		i += n6
+		i--
+		dAtA[i] = 0x6a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *Event_ApplicationDeleted) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *Event_ApplicationDeleted) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.ApplicationDeleted != nil {
-		dAtA[i] = 0x72
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(m.ApplicationDeleted.Size()))
-		n7, err := m.ApplicationDeleted.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.ApplicationDeleted.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvents(dAtA, i, uint64(size))
 		}
-		i += n7
+		i--
+		dAtA[i] = 0x72
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *Meta) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -907,26 +831,33 @@ func (m *Meta) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Meta) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Meta) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.UserId) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.UserId)))
-		i += copy(dAtA[i:], m.UserId)
-	}
 	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	return i, nil
+	if len(m.UserId) > 0 {
+		i -= len(m.UserId)
+		copy(dAtA[i:], m.UserId)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.UserId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationCreated) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -934,32 +865,40 @@ func (m *ApplicationCreated) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationCreated) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationCreated) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Id) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
-		i += copy(dAtA[i:], m.Id)
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.Label) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.Label)
+		copy(dAtA[i:], m.Label)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.Label)))
-		i += copy(dAtA[i:], m.Label)
+		i--
+		dAtA[i] = 0x12
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationActivated) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -967,26 +906,33 @@ func (m *ApplicationActivated) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationActivated) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationActivated) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Id) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
-		i += copy(dAtA[i:], m.Id)
-	}
 	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	return i, nil
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationDeactivated) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -994,26 +940,33 @@ func (m *ApplicationDeactivated) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationDeactivated) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationDeactivated) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Id) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
-		i += copy(dAtA[i:], m.Id)
-	}
 	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	return i, nil
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationLabelChanged) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1021,38 +974,47 @@ func (m *ApplicationLabelChanged) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationLabelChanged) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationLabelChanged) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Id) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
-		i += copy(dAtA[i:], m.Id)
-	}
-	if len(m.Old) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Old)))
-		i += copy(dAtA[i:], m.Old)
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.New) > 0 {
-		dAtA[i] = 0x1a
-		i++
+		i -= len(m.New)
+		copy(dAtA[i:], m.New)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.New)))
-		i += copy(dAtA[i:], m.New)
+		i--
+		dAtA[i] = 0x1a
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.Old) > 0 {
+		i -= len(m.Old)
+		copy(dAtA[i:], m.Old)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Old)))
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationDeleted) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1060,30 +1022,39 @@ func (m *ApplicationDeleted) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationDeleted) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationDeleted) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Id) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
-		i += copy(dAtA[i:], m.Id)
-	}
 	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	return i, nil
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintEvents(dAtA []byte, offset int, v uint64) int {
+	offset -= sovEvents(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 
 func (m *Event) Size() (n int) {
@@ -1294,14 +1265,7 @@ func (m *ApplicationDeleted) Size() (n int) {
 }
 
 func sovEvents(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 
 func sozEvents(x uint64) (n int) {
